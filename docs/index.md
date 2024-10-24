@@ -67,3 +67,25 @@ sudo nginx -t
 Los cambios de este apartado se realizan sobre la MV que vaya a funcionar como servidor proxy, 
 es decir, la que se encuentra entre servidor y cliente y redirige las peticiones.
 
+Cambiaremos el contenido del archivo de configuración /etc/nginx/sites-available para que redirija 
+las peticiones que reciba al Servidor Web.
+
+![Archivo configuración Servidor Web](./images/03conf_proxy.png)
+
+> [!IMPORTANT]
+> Hay que tener especial cuidado con las IPs que estamos utilizando ya que trabajamos con tres 
+> máquinas distintas. En mi caso son 192.168.0.20 (Webserver), 192.168.0.21 (Proxy) y 
+> 192.168.0.13 (Máquina anfitriona).
+
+Ahora, si buscamos en el navegador de nuestra máquina anfitriona "192.168.0.21:80", se enviará 
+una petición al proxy y será redirigida al servidor web. Podemos comprobar que la petición haya pasado 
+por ambos servidores leyendo el archivo /var/log/nginx/access.log en ambas máquinas.
+
+También podemos comprobarlo añadiendo una cabecera a la petición desde el servidor proxy, añadiendo 
+una línea más al archivo de configuración:
+
+![Archivo con header](./images/04conf_header.png)
+
+Ahora, si inspeccionamos la página al entrar desde la máquina anfitriona:
+
+![Página con header](./images/05header_host.png)
