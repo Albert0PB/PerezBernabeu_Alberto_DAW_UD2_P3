@@ -1,0 +1,12 @@
+# Practica 2.3 - Proxy inverso con Nginx
+
+## Clonación de MV y primeros ajustes
+
+Antes de empezar a configurar el proxy inverso, necesitamos una nueva máquina virtual. Para ello, clono 
+la máquina con Nginx configurado. 
+
+![Clonar MV](./images/00clonacion_mv.png)
+
+En esta nueva MV deberemos realizar una serie de ajustes antes de configurarla como servidor de proxy inverso.
+
+

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="None">
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>My Docs</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">My Docs</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#practica-23-proxy-inverso-con-nginx" class="nav-link">Práctica 2.3 - Proxy inverso con Nginx</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#clonacion-de-mv" class="nav-link">Clonación de MV</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#cambios-en-la-mv-con-rol-de-server-web" class="nav-link">Cambios en la MV con rol de Server Web</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#cambios-en-la-mv-con-rol-de-servidor-de-proxy-inverso" class="nav-link">Cambios en la MV con rol de Servidor de Proxy Inverso</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="practica-23-proxy-inverso-con-nginx">Práctica 2.3 - Proxy inverso con Nginx</h1>
+<h2 id="clonacion-de-mv">Clonación de MV</h2>
+<p>Para crear un servir de proxy inverso, en primer lugar necesitaremos una nueva MV que 
+cumpla con este rol. Para ello, clonamos la máquina virtual en la que ya teníamos 
+configurado Nginx, de manera que tendremos dos máquinas virtuales idénticas:</p>
+<p><img alt="Clonar MV" src="images/00clonacion_mv.png" /></p>
+<h2 id="cambios-en-la-mv-con-rol-de-server-web">Cambios en la MV con rol de Server Web</h2>
+<p>Los cambios de este apartado se realizan sobre la MV que vaya a funcionar como servidor web, 
+es decir, la que se enfoca a alojar los datos de nuestra página.</p>
+<p>Para ello cambiaremos el nombre de nuestra página a 'webserver', tanto del directorio 
+en /var/www que contiene los archivos de la página como en el archivo de configuración en 
+/etc/nginx/sites-available y el enlace simbólico a /etc/nginx/sites-enabled.</p>
+<p>En primer lugar, ejecutamos:</p>
+<pre><code class="language-console">cd /var/www
+sudo mv despliegue1/ webserver/
+</code></pre>
+<p>A continuación, para listar los enlaces simbólicos y comprobar sus nombres podemos ejecutar:</p>
+<pre><code class="language-console">cd /etc/nginx/sites-enabled
+ls -l
+</code></pre>
+<p><img alt="Listar symlinks" src="images/01listar_enlaces.png" /></p>
+<p>A continuación eliminamos el symlink (en mi caso se llama despliegue1 porque es el nombre 
+que le di a mi página) con el comando:</p>
+<pre><code class="language-console">sudo unlink despliegue1
+</code></pre>
+<p>Ahora cambiamos el nombre del sitio a 'webserver' en el archivo de configuración de 
+la página. Con: </p>
+<pre><code class="language-console">cd /etc/nginx/sites-available
+mv despliegue1 webserver
+</code></pre>
+<p>cambiamos el nombre del archivo en sí. Realizamos el mismo cambio dentro del archivo de la siguiente manera:</p>
+<p><img alt="Archivo configuración webserver" src="images/02conf_webserver.png" /></p>
+<blockquote>
+<p>[!NOTE]
+También se podría realizar un cambio similar en /etc/hosts pero no es 
+estrictamente necesario para el funcionamiento del servidor.</p>
+</blockquote>
+<p>Realizados los cambios sobre el archivo de configuración, creamos un nuevo enlace simbólico ejecutando:</p>
+<pre><code class="language-console">sudo ln -s /etc/nginx/sites-available/webserver /etc/nginx/sites-enabled
+</code></pre>
+<p>Reiniciamos Nginx y comprobamos que funciona sin errores con:</p>
+<pre><code class="language-console">sudo systemctl restart nginx
+sudo nginx -t
+</code></pre>
+<h2 id="cambios-en-la-mv-con-rol-de-servidor-de-proxy-inverso">Cambios en la MV con rol de Servidor de Proxy Inverso</h2>
+<p>Los cambios de este apartado se realizan sobre la MV que vaya a funcionar como servidor proxy, 
+es decir, la que se encuentra entre servidor y cliente y redirige las peticiones.</p>
+<p>Cambiaremos el contenido del archivo de configuración /etc/nginx/sites-available para que redirija 
+las peticiones que reciba al Servidor Web.</p>
+<p><img alt="Archivo configuración Servidor Web" src="images/03conf_proxy.png" /></p>
+<blockquote>
+<p>[!IMPORTANT]
+Hay que tener especial cuidado con las IPs que estamos utilizando ya que trabajamos con tres 
+máquinas distintas. En mi caso son 192.168.0.20 (Webserver), 192.168.0.21 (Proxy) y 
+192.168.0.13 (Máquina anfitriona).</p>
+</blockquote>
+<p>Ahora, si buscamos en el navegador de nuestra máquina anfitriona "192.168.0.21:80", se enviará 
+una petición al proxy y será redirigida al servidor web. Podemos comprobar que la petición haya pasado 
+por ambos servidores leyendo el archivo /var/log/nginx/access.log en ambas máquinas.</p>
+<p>También podemos comprobarlo añadiendo una cabecera a la petición desde el servidor proxy, añadiendo 
+una línea más al archivo de configuración:</p>
+<p><img alt="Archivo con header" src="images/04conf_header.png" /></p>
+<p>Ahora, si inspeccionamos la página al entrar desde la máquina anfitriona:</p>
+<p><img alt="Página con header" src="images/05header_host.png" /></p>
+<p>Por lo que queda comprobado que el servidor proxy está funcionando sin problemas.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2024-10-24 21:42:54.928108+00:00
+-->
