@@ -89,3 +89,5 @@ una línea más al archivo de configuración:
 Ahora, si inspeccionamos la página al entrar desde la máquina anfitriona:
 
 ![Página con header](./images/05header_host.png)
+
+Por lo que queda comprobado que el servidor proxy está funcionando sin problemas.
