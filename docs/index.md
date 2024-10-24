@@ -48,7 +48,22 @@ cambiamos el nombre del archivo en sí. Realizamos el mismo cambio dentro del ar
 ![Archivo configuración webserver](./images/02conf_webserver.png)
 
 > [!NOTE]
-> También sería adecuado realizar un cambio similar en /etc/hosts pero no es 
+> También se podría realizar un cambio similar en /etc/hosts pero no es 
 > estrictamente necesario para el funcionamiento del servidor.
 
+Realizados los cambios sobre el archivo de configuración, creamos un nuevo enlace simbólico ejecutando:
+```console
+sudo ln -s /etc/nginx/sites-available/webserver /etc/nginx/sites-enabled
+```
+
+Reiniciamos Nginx y comprobamos que funciona sin errores con:
+```console
+sudo systemctl restart nginx
+sudo nginx -t
+```
+
 ## Cambios en la MV con rol de Servidor de Proxy Inverso
+
+Los cambios de este apartado se realizan sobre la MV que vaya a funcionar como servidor proxy, 
+es decir, la que se encuentra entre servidor y cliente y redirige las peticiones.
+
